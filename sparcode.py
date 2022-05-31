@@ -1,9 +1,7 @@
-import pyspark
-from pyspark.sql import SparkSession
-from pyspark.sql.types import *
-from pyspark.sql.functions import *
-from datetime import datetime
 import os
+
+from pyspark.sql import SparkSession
+
 spark = SparkSession.builder.master("local[*]") \
                     .appName('SparkByExamples.com') \
                     .getOrCreate()
