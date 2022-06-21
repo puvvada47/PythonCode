@@ -99,6 +99,6 @@ def convert(i, a):
 
 #working one
 print(json.dumps(convert_external_ref("C:/Users/KPUVVAD/Desktop/Project/Project_Modules/MBLD/creditPlatform/Credit/creplSchema/MBLD_Request_Interface.json"), separators=(',', ':')))
-print(json.dumps(convert_external_ref("C:/Users/KPUVVAD/Desktop/Project/Project_Modules/MBLD/creditPlatform/Credit/creplSchema/MBLD_Response_Interface.json"), separators=(',', ':')))
+#print(json.dumps(convert_external_ref("C:/Users/KPUVVAD/Desktop/Project/Project_Modules/MBLD/creditPlatform/Credit/creplSchema/MBLD_Response_Interface.json"), separators=(',', ':')))
 
 #

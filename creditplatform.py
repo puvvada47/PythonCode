@@ -1,11 +1,6 @@
-from Tools.scripts.dutree import display
-from pyspark.sql import SparkSession
-from pyspark.sql.types import *
-from pyspark.sql.functions import *
-from datetime import datetime
 import json
-import os
-from pyspark.sql.functions import lit, current_timestamp
+
+from pyspark.sql import SparkSession
 from pyspark.sql.types import *
 
 spark = SparkSession.builder.master("local[*]") \
@@ -23,7 +18,7 @@ requestStructType = StructType.fromJson(json.loads(requestSchemaStr))
 # textHandler = sc._jvm.com.daimler.nbx.pseudo.lib.handler.TextHandler()
 # textHandler.setPasswordPhrase("crepl")
 
-with open("C:/Users/KPUVVAD/Desktop/Project/Project_Modules/creditplatform/request.json") as jsonFile:
+with open("C:/Users/KPUVVAD/Desktop/Project/Project_Modules/MBLD/creditPlatform/creditplatform/request.json") as jsonFile:
     requestMap: object=json.load(jsonFile)
     #requestMap is dictionary each json is a Dictionary with key value pairs
 if "requests" in requestMap:
@@ -32,6 +27,13 @@ if "requests" in requestMap:
              print(0)
              print(request)
              print(type(request))
+
+             request=requestMap["requests"][0]
+             borrowUnits=request["borrowerUnits"]
+
+             iban=requestMap["requests"][0]["borrowerUnits"][0]["businessPartners"][
+                 0]["proposalAndContracts"][0]["contract"][
+                 "iban"]
 
              print(requestMap["requests"][0]["borrowerUnits"][0]["businessPartners"][
                  0]["proposalAndContracts"][0]["contract"][
@@ -45,7 +47,7 @@ if "requests" in requestMap:
                        0]["proposalAndContracts"][0]["contract"]))
 
 df= spark.read.format("json").schema(requestStructType).option("multiLine", "true").load(
-                 "C:/Users/KPUVVAD/Desktop/Project/Project_Modules/creditplatform/request.json")
+                 "C:/Users/KPUVVAD/Desktop/Project/Project_Modules/MBLD/creditPlatform/creditplatform/request.json")
 list=df.collect()
 for e in list:
     print(e)
