@@ -18,6 +18,15 @@ print(set)
 
 
 dictionary = {"name" : "John", "age" : 36,"salary" : 50000, "desination":"softwareEngineer"}
+
+dictionary["department"]="informationTechnology"
+keys=dictionary.keys()
+
+
+print("dictinary")
+for key in keys:
+    print(dictionary[key])
+
 print(dictionary["age"])
 print(len(dictionary))
 a=dictionary.__getitem__("salary")
