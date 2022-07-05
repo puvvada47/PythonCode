@@ -5,7 +5,6 @@ import dbutils
 from Tools.scripts.dutree import display
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import lit
-from pyspark.sql.types import *
 
 #variable Declaration
 env="dev"
@@ -40,7 +39,13 @@ zeb2BiCsvToTableSchemaDict = {
 }
 nullToDFColumn=lambda dataframe, field : dataframe.withColumn(field, lit("Null"))
 
+
+dict={}
+almList=list()
+posList=list()
+
 spark = SparkSession.builder.master("local[*]").appName('SparkByExamples.com')
+
 
 
 
@@ -61,26 +66,24 @@ for zippFile in dbutils.fs.ls(zipPath):
         print("file Name : " + zippFileName)
         if (zippFileName.__contains__("POS_CONTRIBUTION_TB")):
             if len(zippFileName.split("_")) > 4:
-                zipKeyDate = zippFileName.split("_")[4]
+                zipDate = zippFileName.split("_")[4]
         elif (zippFileName.__contains__("ALM")):
             if len(zippFileName.split("_")) > 2:
-                zipKeyDate = zippFileName.split("_")[2]
+                zipDate = zippFileName.split("_")[2]
         else:
             print("not related zip: " + zippFileName)
-        print("key date: " + zipKeyDate)
+        print("zip date: " + zipDate)
         for zipFile in dbutils.fs.ls(zipPath):
             if (zipFile.isFile):
                 zipfileName = zipFile.name
                 if (zippFileName != zipfileName and zipfileName.__contains__("POS_CONTRIBUTION_TB") and len(zipfileName.split("_"))>4 and len(zippFileName.split("_"))>2):
-                    posZipKeyDate = zipfileName.split("_")[4]
-                    if zipKeyDate == posZipKeyDate:
-                        print("keydate for ALM and POS zip matching: ", zipKeyDate)
+                    posZipDate = zipfileName.split("_")[4]
+                    if zipDate == posZipDate:
+                        print("zipdate for ALM and POS zip matching: ", zipDate)
                         posTimsestamp = zipfileName.split("_")[5].split(".")[0]
-                        almTImestamp = zippFileName.split("_")[3].split(".")[0]
-                        posFileCreationTs = datetime.strptime(posZipKeyDate + " " + posTimsestamp,
-                                                              '%Y%m%d %H%M%S%f').strftime("%Y-%m-%dT%H:%M:%S.%f")
-                        almFileCreationTs = datetime.strptime(zipKeyDate + " " + almTImestamp,
-                                                              '%Y%m%d %H%M%S%f').strftime("%Y-%m-%dT%H:%M:%S.%f")
+                        almTimestamp = zippFileName.split("_")[3].split(".")[0]
+                        posFileCreationTs = datetime.strptime(posZipDate + " " + posTimsestamp, '%Y%m%d %H%M%S%f').strftime("%Y-%m-%dT%H:%M:%S.%f")
+                        almFileCreationTs = datetime.strptime(zipDate + " " + almTimestamp, '%Y%m%d %H%M%S%f').strftime("%Y-%m-%dT%H:%M:%S.%f")
                         creationTimeStamp = datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f")
                         posZipFileName = zipfileName
                         print("creationtimestamp", creationTimeStamp)
@@ -93,7 +96,6 @@ for zippFile in dbutils.fs.ls(zipPath):
                         shutil.unpack_archive(dbfs + zipPath + "/" + posZipFileName, dbfs + unZipPath, archive_format)
                         dbutils.fs.mv(zipPath + "/" + zippFileName, archiveZipPath)
                         dbutils.fs.mv(zipPath + "/" + posZipFileName, archiveZipPath)
-
                         for dbfsFile in dbutils.fs.ls(unZipPath):
                             if zeb2BiCsvToTableSchemaDict.__contains__(dbfsFile.name):
                                 print("csv file: ", dbfsFile.name)
@@ -114,27 +116,25 @@ for zippFile in dbutils.fs.ls(zipPath):
                                 dfDiff = set(dfSchema).difference(set(fixedSchema))
                                 print("columns present in fixed schema but not in csv file schema: ", diff)
                                 print("columns present in csv file schema but not in fixed schema: ", dfDiff)
-                                if (len(dfDiff) > 0):
+                                if len(dfDiff) > 0:
                                     df = df.drop(*(dfDiff))
                                 if len(diff) > 0:
                                     [df := nullToDFColumn(df, field) for field in diff]
-                                    display(df)
                                 columns_list = df.columns
                                 print("final columns in sync with fixed schema: ", columns_list)
-                                for column in columns_list:
-                                    df = df.withColumn(column, df[column].cast(StringType()))
                                 if table == "ZEB_I_POS_CONTRIBUTION_TB":
-                                    df = df.withColumn("creationts", lit(creationTimeStamp)).withColumn(
-                                        "filecreationts", lit(posFileCreationTs))
+                                    df = df.withColumn("creationts", lit(creationTimeStamp)).withColumn( "filecreationts", lit(posFileCreationTs))
                                 else:
-                                    df = df.withColumn("creationts", lit(creationTimeStamp)).withColumn(
-                                        "filecreationts", lit(almFileCreationTs))
+                                    df = df.withColumn("creationts", lit(creationTimeStamp)).withColumn("filecreationts", lit(almFileCreationTs))
                                 display(df)
                                 df.write.format("delta").mode("append").save(tablePath)
+                                optimizeDelta="OPTIMIZE delta.`"+tablePath+"`"
+                                spark.sql(optimizeDelta)
+                                print("optimization on Delta Files Completed")
                                 createTabSqlQuery = "CREATE TABLE IF NOT EXISTS " + databaseName + "." + table + " USING DELTA LOCATION " + "'" + tablePath + "'"
                                 zebDF = spark.sql(createTabSqlQuery)
                             else:
                                 print("zeb2BiCsvToTableSchemaDict does not contain File Name: ",dbfsFile.name)
                         break
                     else:
-                        print("keydate for ALM and POS zip not matching")
+                        print("zipdate for ALM and POS zip not matching")
