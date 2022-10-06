@@ -12,7 +12,7 @@ list=[]
 
 fixedSchema = ["age","name","salary","org"]
 addedColumnFn=lambda DF,col: DF.withColumn(col,lit("Null"))
-df: DataFrame= spark.read.format("com.databricks.spark.csv").option("header", "true").option("delimiter", ";").load(
+df= spark.read.format("com.databricks.spark.csv").option("header", "true").option("delimiter", ";").load(
     "C:/Users/KPUVVAD/Desktop/emp.csv")
 print("inital schema: ",df.schema)
 df.show()

@@ -39,13 +39,18 @@ def convert_internal_ref(ref, a):
 
 
 def convert_external_ref(ref):
+    print("path: ",ref)
     owd = os.getcwd()
+    print("cwd: ",owd)
     (nwd, fn) = os.path.split(ref)
+    print("split output: ",nwd,fn)
     if nwd != "":
         os.chdir(nwd)
     if fn[-1] == "#":
         fn = fn[:-1]
+        print("fn output: ",fn)
     a = read_json(fn)
+    print("dictionary: ",a)
     r = convert(a, a)
     os.chdir(owd)
     return r

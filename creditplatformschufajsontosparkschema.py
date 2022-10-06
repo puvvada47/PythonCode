@@ -98,7 +98,7 @@ def convert(i, a):
 
 #working one
 
-print(json.dumps(convert_external_ref("C:/Users/KPUVVAD/Desktop/Project/Project_Modules/MBLD/creditPlatform/newCreditPlatformJSON/JSON-SCHEMA/MBLD_Request_Interface.json"), separators=(',', ':')))
+print(json.dumps(convert_external_ref("C:/Users/KPUVVAD/Desktop/Project/Project_Modules/MBLD/creditPlatform/schufa/JSON-SCHEMA/schufa-processes/schufa-nachmeldungen/response.json"), separators=(',', ':')))
 
 #print(json.dumps(convert_external_ref("C:/Users/KPUVVAD/Desktop/Project/Project_Modules/MBLD/creditPlatform/newCreditPlatformJSON/JSON-SCHEMA/CreditPlatformResponse.json"), separators=(',', ':')))
 

@@ -541,22 +541,22 @@ def get_all_nodes():
             nodes[src] = {}
             nodes[src]['ok'] = []
             nodes[src]['err'] = []
-            nodes[src]['ok'].append(dst)
+            nodes[src]['ok'].appendOutput(dst)
 
             nodes[dst] = {}
             nodes[dst]['ok'] = []
             nodes[dst]['err'] = []
             nodes[dst]['in'] = []
 
-            nodes[dst]['in'].append(src)
+            nodes[dst]['in'].appendOutput(src)
         elif "ok to=" in line:
-            nodes[src]['ok'].append(extract_action_name(line))
-            nodes[src]['in'].append(extract_action_name(line))
+            nodes[src]['ok'].appendOutput(extract_action_name(line))
+            nodes[src]['in'].appendOutput(extract_action_name(line))
         elif "error to" in line:
-            nodes[src]['err'].append(extract_action_name(line))
-            nodes[src]['in'].append(extract_action_name(line))
+            nodes[src]['err'].appendOutput(extract_action_name(line))
+            nodes[src]['in'].appendOutput(extract_action_name(line))
         elif "path start" in line:
-            nodes[src]['ok'].append(extract_action_name(line))
+            nodes[src]['ok'].appendOutput(extract_action_name(line))
 
     return nodes
 

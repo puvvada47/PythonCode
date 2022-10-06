@@ -1,16 +1,17 @@
 from datetime import datetime
-
 from pyspark.sql import SparkSession
 
 spark = SparkSession.builder.master("local[*]") \
-                    .appName('SparkByExamples.com') \
+                    .appName('SparkByExamples.com').getOrCreate()\
 
-df = spark.read.csv("C:/Users/MKONDAP/Desktop/Learning/sample.csv")
+dept = [("Finance",10,20),("Marketing",20),("Sales",30),("IT",40),10,"viswa"]
+df = spark.read.csv("C:/Users/KPUVVAD/Desktop/Personal/Interviews/Madhav_Stuff/Learning/sample.csv")
 df.show()
-df.createOrReplaceTempView()
+df.createOrReplaceTempView("tableName")
 k=df.head()#it will give single row if head is 1 otherwise it will give list of rows
 df.rdd.collect()#it will return list
 df.filter()
+
 
 list=df.limit(1).collect()
 if len(list)==1:
